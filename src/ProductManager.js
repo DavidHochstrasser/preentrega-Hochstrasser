@@ -2,8 +2,8 @@ import fs from "fs";
 
 class ProductManager {
   static id = 0;
-  constructor(path) {
-    this.path = path;
+  constructor() {
+    this.path = "./productos.json";
     this.products = [];
   }
 
@@ -14,11 +14,13 @@ class ProductManager {
       id: ProductManager.id,
     };
     this.products.push(newProduct);
-    await this.escribirArchivoConProductos();
+    this.writeProducts();
     return newProduct;
   }
 
   async getProducts() {
+    const data = await fs.promises.readFile(this.path, "utf8");
+    this.products = JSON.parse(data);
     return this.products;
   }
 
@@ -32,43 +34,43 @@ class ProductManager {
   }
 
   async updateProduct(id, newData) {
-    const productIndex = this.products.findIndex((item) => item.id === id);
+    const products = await this.getProducts();
+    const productIndex = products.findIndex((item) => item.id === id);
     if (productIndex !== -1) {
-      const updatedProduct = {
-        ...this.products[productIndex],
+      products[productIndex] = {
+        ...products[productIndex],
         ...newData,
-        id: id,
       };
-      this.products[productIndex] = updatedProduct;
-      await this.escribirArchivoConProductos();
-      return updatedProduct;
+      await fs.promises.writeFile(this.path, JSON.stringify(products));
+      console.log(`Producto con id ${id} actualizado.`);
     } else {
-      throw new Error("Product not found");
+      console.log(`No se encontró ningún producto con el id ${id}.`);
     }
   }
 
   async deleteProduct(id) {
-    const initialLength = this.products.length;
-    this.products = this.products.filter((item) => item.id !== id);
+    const products = await this.getProducts();
+    const filteredProducts = products.filter((item) => item.id != id);
 
-    if (this.products.length < initialLength) {
-      await this.escribirArchivoConProductos();
-    } else {
-      throw new Error("Product not found");
+    if (products.length === filteredProducts.length) {
+      console.log(`No se encontro producto con el ID ${id}`);
+      return;
     }
+
+    await fs.promises.writeFile(this.path, JSON.stringify(filteredProducts));
+    console.log(`Producto con ID ${id} eliminado`);
   }
 
-  async escribirArchivoConProductos() {
-    await fs.promises.writeFile(
-      this.path,
-      JSON.stringify(this.products, null, 2)
-    );
+  async writeProducts() {
+    await fs.promises.writeFile(this.path, JSON.stringify(this.products));
   }
 }
 
 const manager1 = new ProductManager("./productos.json");
-
 // console.log(manager1.getProducts());
+
+//Productos de ejemplos
+
 const newProduct = {
   titulo: "titulo1",
   description: "descripcion1",
@@ -93,12 +95,48 @@ const newProduct3 = {
   code: "code3",
   stock: 30,
 };
-
+const newProduct4 = {
+  titulo: "titulo4",
+  description: "descripcion4",
+  price: 4000,
+  thumbnail: "thumbnail4",
+  code: "code4",
+  stock: 40,
+};
+const newProduct5 = {
+  titulo: "titulo5",
+  description: "descripcion5",
+  price: 5000,
+  thumbnail: "thumbnail5",
+  code: "code5",
+  stock: 50,
+};
+const newProduct6 = {
+  titulo: "titulo6",
+  description: "descripcion6",
+  price: 6000,
+  thumbnail: "thumbnail6",
+  code: "code6",
+  stock: 60,
+};
+const newProduct7 = {
+  titulo: "titulo7",
+  description: "descripcion7",
+  price: 7000,
+  thumbnail: "thumbnail7",
+  code: "code7",
+  stock: 70,
+};
 export default ProductManager;
+
 //Agregar Productos al Array
 // manager1.addProduct(newProduct);
 // manager1.addProduct(newProduct2);
 // manager1.addProduct(newProduct3);
+// manager1.addProduct(newProduct4);
+// manager1.addProduct(newProduct5);
+// manager1.addProduct(newProduct6);
+// manager1.addProduct(newProduct7);
 
 //LLamar Productos en Array
 // manager1.getProducts().then((products) => {
@@ -108,12 +146,13 @@ export default ProductManager;
 //Modificar Producto Update
 // await manager1.updateProduct(1, {
 //   titulo: "New Product Updated",
-// });
+//   description: "New Product Updated",
+// });titulo: "New Product Updated",
 
 // manager1.updateProduct(2, titulo);
 
 //Buscar Productos por ID
-// manager1.getProductsById(1);
+// console.log(manager1.getProductsById(1));
 
 //Borra Producto por ID
 // await manager1.deleteProduct(3);

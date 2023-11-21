@@ -23,14 +23,17 @@ app.use(express.urlencoded({ extended: true }));
 socketServer.on("connection", (socket) => {
   console.log("Usuario conectado");
 
-  socket.on("crearProducto", async (nuevoProducto) => {
-    socketServer.emit("productoCreado", await ProductManagerJson.getProducts());
+  socket.on("agregarProducto", async (nuevoProducto) => {
+    socketServer.emit(
+      "productoCreado",
+      await ProductManagerJson.addProduct(nuevoProducto)
+    );
   });
 
   socket.on("eliminarProducto", async (productoId) => {
     socketServer.emit(
       "productoEliminado",
-      await ProductManagerJson.getProducts()
+      await ProductManagerJson.deleteProduct(productoId)
     );
   });
 
@@ -39,7 +42,7 @@ socketServer.on("connection", (socket) => {
   });
 });
 
-app.get("/realtimeproducts", (req, res) => {
+app.get("/realTimeProducts", (req, res) => {
   res.render("realTimeProducts", {
     title: "Real Time Products",
   });

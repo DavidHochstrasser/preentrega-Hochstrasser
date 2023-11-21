@@ -1,3 +1,4 @@
+
 <div>
     <h1>INGRESO DE PRODUCTOS</h1>
 
@@ -8,6 +9,22 @@
          <input type="text" name="code" placeholder="code"><br />
           <input type="number" name="stock" placeholder="stock"><br />
         
-        <button type="submit">Agregar</button>
+        <button onClick = "sendProduct()">Agregar</button>
+        
+      
     </form>
 </div>
+
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socketClient = io();
+
+    const sendProduct = () = {
+socketClient.emit('agregarProducto', products  )
+    }
+    
+
+
+</script>
